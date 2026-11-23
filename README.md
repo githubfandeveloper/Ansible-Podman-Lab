@@ -643,6 +643,3 @@ podman rmi ansible-control ansible-node   # optional: remove images
 
 ---
 
-## 📄 License
-
-For personal learning use. Add a license file (e.g. MIT) if you plan to share this publicly.
