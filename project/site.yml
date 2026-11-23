@@ -1,0 +1,27 @@
+---
+- name: Install nginx on the web host
+  hosts: web
+  become: true
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+
+- name: Simple hostname test on the db host
+  hosts: db
+  tasks:
+    - name: Run hostname
+      command: hostname
+      register: out
+      changed_when: false
+
+    - name: Show result
+      debug:
+        msg: "DB host reports {{ out.stdout }}"

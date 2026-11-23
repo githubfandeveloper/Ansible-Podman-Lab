@@ -1,0 +1,28 @@
+# Dockerfile.node – managed node (Python + sshd)
+FROM ubuntu:22.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3 \
+        openssh-server \
+        sudo \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG USERNAME=vagrant
+ARG UID=1000
+ARG GID=1000
+
+# Create the vagrant user WITH a password (vagrant) + passwordless sudo
+RUN groupadd -g ${GID} ${USERNAME} && \
+    useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USERNAME} && \
+    echo "${USERNAME}:vagrant" | chpasswd && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Prepare sshd: runtime dir + host keys + lab-friendly auth settings
+RUN mkdir -p /run/sshd && ssh-keygen -A && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
